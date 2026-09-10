@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
 
 const NAV_LINKS = ['Home', 'About', 'Services', 'Projects', 'Skills', 'Contact']
 
@@ -13,6 +12,28 @@ function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setIsOpen(false)
+    }
+    const closeOnDesktop = () => {
+      if (window.innerWidth >= 1024) setIsOpen(false)
+    }
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', closeOnEscape)
+    window.addEventListener('resize', closeOnDesktop)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', closeOnEscape)
+      window.removeEventListener('resize', closeOnDesktop)
+    }
+  }, [isOpen])
 
   const handleNavClick = (e, link) => {
     e.preventDefault()
@@ -42,10 +63,10 @@ function Navbar() {
       transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       className="fixed top-0 left-0 w-full z-50 transition-all duration-500"
       style={{
-        backgroundColor: 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled
+        backgroundColor: isOpen ? 'rgba(8,8,8,0.97)' : 'transparent',
+        backdropFilter: scrolled || isOpen ? 'blur(12px)' : 'none',
+        WebkitBackdropFilter: scrolled || isOpen ? 'blur(12px)' : 'none',
+        borderBottom: scrolled || isOpen
           ? '1px solid rgba(212, 175, 55, 0.15)'
           : '1px solid transparent',
       }}
@@ -87,12 +108,30 @@ function Navbar() {
         {/* ── Hamburger — mobile only ────────────────────────── */}
         <button
           type="button"
-          className="flex h-11 w-11 items-center justify-center text-[#D4AF37] lg:hidden"
+          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#D4AF37] transition-colors duration-300 hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-black lg:hidden"
           aria-label={isOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isOpen}
+          aria-controls="mobile-navigation"
           onClick={() => setIsOpen(prev => !prev)}
         >
-          {isOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
+          <span
+            aria-hidden="true"
+            className={`absolute h-0.5 w-6 rounded-full bg-current transition-all duration-300 ${
+              isOpen ? 'top-[21px] rotate-45' : 'top-[14px]'
+            }`}
+          />
+          <span
+            aria-hidden="true"
+            className={`absolute top-[21px] h-0.5 w-6 rounded-full bg-current transition-all duration-300 ${
+              isOpen ? 'scale-x-50 opacity-0' : 'opacity-100'
+            }`}
+          />
+          <span
+            aria-hidden="true"
+            className={`absolute h-0.5 w-6 rounded-full bg-current transition-all duration-300 ${
+              isOpen ? 'top-[21px] -rotate-45' : 'top-[28px]'
+            }`}
+          />
         </button>
       </div>
 
@@ -100,11 +139,12 @@ function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id="mobile-navigation"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute top-full left-0 w-full overflow-hidden lg:hidden"
+            className="absolute left-0 top-full max-h-[calc(100svh-77px)] w-full overflow-x-hidden overflow-y-auto overscroll-contain sm:max-h-[calc(100svh-84px)] lg:hidden"
             style={{
               backgroundColor: 'rgba(10,10,10,0.97)',
               backdropFilter: 'blur(16px)',
@@ -112,7 +152,7 @@ function Navbar() {
               borderBottom: '1px solid rgba(212,175,55,0.15)',
             }}
           >
-            <ul className="flex flex-col items-center gap-0 py-2">
+            <ul className="flex min-h-full flex-col items-center justify-center gap-0 py-1 sm:py-2">
               {NAV_LINKS.map((link, i) => (
                 <motion.li
                   key={link}
@@ -124,7 +164,7 @@ function Navbar() {
                   <a
                     href={link === 'Home' ? '#' : `#${link.toLowerCase()}`}
                     onClick={(e) => handleNavClick(e, link)}
-                    className="block w-full py-4 text-center font-['Inter'] text-xs font-medium uppercase tracking-[0.25em] text-white/80 transition-colors duration-300 hover:text-[#D4AF37]"
+                    className="block min-h-12 w-full py-3.5 text-center font-['Inter'] text-xs font-medium uppercase tracking-[0.25em] text-white/80 transition-colors duration-300 hover:text-[#D4AF37] focus-visible:bg-white/5 focus-visible:text-[#D4AF37] focus-visible:outline-none sm:py-4"
                   >
                     {link}
                   </a>
