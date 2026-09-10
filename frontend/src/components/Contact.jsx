@@ -77,7 +77,7 @@ function Contact() {
       className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-transparent scroll-mt-0 border-t border-white/5"
       style={{ padding: 'clamp(2rem, 4vw, 4rem) clamp(1rem, 6vw, 6rem)' }}
     >
-      <div className="relative mx-auto max-w-[1440px] w-full px-6 md:px-12">
+      <div className="relative mx-auto w-full max-w-[1440px] px-0 sm:px-6 md:px-12">
         {/* Top Header */}
         <div className="flex flex-col items-center text-center" style={{ marginBottom: '30px' }}>
           <motion.p
@@ -95,7 +95,7 @@ function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, margin: '-50px' }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-2xl font-semibold text-white md:text-3xl tracking-wide max-w-xl leading-relaxed"
+            className="max-w-xl text-2xl font-semibold leading-snug tracking-wide text-white sm:leading-relaxed md:text-3xl"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
             Let&apos;s Create Something <span className="text-[#D4AF37] italic">Extraordinary</span>
@@ -220,7 +220,7 @@ function Contact() {
           </div>
 
           {/* Right Column: Direct Collaboration Inquiry Form */}
-          <div className="lg:col-span-7 w-full bg-white/[0.02] border border-white/5 rounded-2xl p-8 md:p-10 shadow-xl">
+          <div className="w-full rounded-2xl border border-white/5 bg-white/[0.02] p-5 shadow-xl sm:p-8 md:p-10 lg:col-span-7">
             <div className="text-center mb-8">
               <h3 className="font-['Inter'] text-lg md:text-xl font-semibold text-white mb-2">
                 Start a Collaboration
@@ -283,7 +283,7 @@ function Contact() {
                 whileTap={{ scale: 0.99 }}
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full mt-2 bg-[#D4AF37] hover:bg-[#c29f2e] text-[#0a0a0a] font-['Inter'] text-1xl font-semibold tracking-wider uppercase py-4 rounded-xl transition-colors duration-300 shadow-lg shadow-[#D4AF37]/10 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`mt-2 w-full rounded-xl bg-[#D4AF37] py-4 font-['Inter'] text-base font-semibold uppercase tracking-wider text-[#0a0a0a] shadow-lg shadow-[#D4AF37]/10 transition-colors duration-300 hover:bg-[#c29f2e] ${isSubmitting ? 'cursor-not-allowed opacity-70' : ''}`}
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </motion.button>

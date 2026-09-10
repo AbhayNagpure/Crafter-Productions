@@ -72,6 +72,13 @@ function ServiceCard({ item, index, isPlaying, onTogglePlay }) {
     onTogglePlay()
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleToggle()
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -79,18 +86,22 @@ function ServiceCard({ item, index, isPlaying, onTogglePlay }) {
       viewport={{ once: false, margin: "-50px" }}
       transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
       onClick={handleToggle}
-      className={`service-card-item snap-center group relative flex h-[460px] w-[85vw] flex-shrink-0 flex-col items-center justify-between overflow-hidden rounded-3xl border bg-[#111111] pt-12 px-10 pb-16 text-center transition-all duration-300 sm:w-[350px] lg:w-[400px] cursor-pointer ${isPlaying
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`${isPlaying ? 'Pause' : 'Play'} ${item.title} preview`}
+      className={`service-card-item group relative flex min-h-[430px] w-[calc(100vw-2rem)] max-w-[360px] flex-shrink-0 snap-center cursor-pointer flex-col items-center justify-between overflow-hidden rounded-3xl border bg-[#111111] px-5 py-8 text-center transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D4AF37] sm:min-h-[450px] sm:w-[350px] sm:px-8 sm:py-10 lg:h-[460px] lg:w-[400px] lg:max-w-none lg:px-10 lg:pb-12 lg:pt-12 ${isPlaying
         ? 'border-[#D4AF37]/50 shadow-[0_10px_40px_rgba(212,175,55,0.15)]'
         : 'border-white/5'
         }`}
     >
       {/* Background YouTube Video on Tap */}
-      {item.youtubeId && (
+      {item.youtubeId && isPlaying && (
         <div className={`absolute inset-0 w-full h-full overflow-hidden z-0 transition-opacity duration-500 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}>
           <div className="absolute inset-0 bg-[#0a0a0a]/20 z-10 pointer-events-none" />
           <iframe
             id={`youtube-iframe-${index}`}
-            src={`https://www.youtube.com/embed/${item.youtubeId}?enablejsapi=1&autoplay=0&mute=0&controls=0&loop=1&playlist=${item.youtubeId}&playsinline=1`}
+            src={`https://www.youtube.com/embed/${item.youtubeId}?enablejsapi=1&autoplay=1&mute=0&controls=0&loop=1&playlist=${item.youtubeId}&playsinline=1`}
             className="absolute top-1/2 left-1/2 w-[300%] h-[300%] -translate-x-1/2 -translate-y-1/2 opacity-90 object-cover scale-[1.1]"
             style={{ border: 'none', pointerEvents: 'none' }}
             allow="autoplay; encrypted-media"
@@ -173,7 +184,7 @@ function ServiceCard({ item, index, isPlaying, onTogglePlay }) {
       </div>
 
       {/* Bottom Play Action Indicator */}
-      <div className="relative z-10 w-full flex items-center justify-center gap-3 transition-all duration-300" style={{ marginBottom: '1rem' }}>
+      <div className="relative z-10 flex w-full items-center justify-center gap-3 transition-all duration-300">
         <span className={`flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(212,175,55,0.1)] ${isPlaying ? 'bg-[#D4AF37] text-[#0a0a0a]' : 'bg-[#D4AF37]/10 text-[#D4AF37]'
           }`}>
           {isPlaying ? (
@@ -197,73 +208,81 @@ function ServiceCard({ item, index, isPlaying, onTogglePlay }) {
 
 function Services() {
   const carouselRef = useRef(null)
+  const currentIndexRef = useRef(0)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [activePlayingIndex, setActivePlayingIndex] = useState(null)
-  const [scrollPadding, setScrollPadding] = useState('0px')
   const totalCards = servicesData.length
 
   // Smoothly center a card
   const goToIndex = (index, keepActive = false, smooth = true) => {
     if (!carouselRef.current) return
     const container = carouselRef.current
-    const card = container.querySelector('.service-card-item')
+    const cards = container.querySelectorAll('.service-card-item')
+    const card = cards[index]
     if (!card) return
 
-    const cardWidth = card.clientWidth
-    const gap = 32
-    const step = cardWidth + gap
+    const centeredLeft = card.offsetLeft - (container.clientWidth - card.clientWidth) / 2
 
     container.scrollTo({
-      left: index * step,
+      left: centeredLeft,
       behavior: smooth ? 'smooth' : 'auto'
     })
 
+    currentIndexRef.current = index
     setCurrentIndex(index)
     if (!keepActive) {
       setActivePlayingIndex(null)
     }
   }
 
-  // Calculate padding so cards snap to perfect container center
+  // Keep the first and last cards centered, including after device rotation.
   useEffect(() => {
-    const updatePadding = () => {
-      if (!carouselRef.current) return
-      const card = carouselRef.current.querySelector('.service-card-item')
-      if (card) {
-        const halfWidth = card.clientWidth / 2
-        setScrollPadding(`calc(50% - ${halfWidth}px)`)
-      }
+    const container = carouselRef.current
+    if (!container) return
+
+    let resizeFrame
+    let alignmentFrame
+    const scheduleLayout = () => {
+      cancelAnimationFrame(resizeFrame)
+      resizeFrame = requestAnimationFrame(() => {
+        const card = container.querySelector('.service-card-item')
+        if (!card) return
+
+        const sidePadding = Math.max(0, (container.clientWidth - card.clientWidth) / 2)
+        container.style.paddingInline = `${sidePadding}px`
+        container.style.scrollPaddingInline = `${sidePadding}px`
+        cancelAnimationFrame(alignmentFrame)
+        alignmentFrame = requestAnimationFrame(() => {
+          goToIndex(currentIndexRef.current, true, false)
+        })
+      })
     }
-    setTimeout(updatePadding, 50)
-    window.addEventListener('resize', updatePadding)
 
-    // Center on the 3rd or 4th card initially based on screen size
-    setTimeout(() => {
-      const vw = window.innerWidth
-      let initialIndex = 2 // 3rd card default
-      if (vw >= 1024) initialIndex = 2 // Desktop
-      
-      goToIndex(initialIndex, false, false)
-    }, 100)
+    window.addEventListener('resize', scheduleLayout)
+    scheduleLayout()
 
-    return () => window.removeEventListener('resize', updatePadding)
+    return () => {
+      cancelAnimationFrame(resizeFrame)
+      cancelAnimationFrame(alignmentFrame)
+      window.removeEventListener('resize', scheduleLayout)
+    }
   }, [])
 
   // Detect currently active card in center on scroll
   const handleScroll = () => {
     if (!carouselRef.current) return
     const container = carouselRef.current
-    const card = container.querySelector('.service-card-item')
-    if (!card) return
-
-    const cardWidth = card.clientWidth
-    const gap = 32 // gap-8 = 2rem = 32px
-    const step = cardWidth + gap
-
-    // Calculate index based on scroll position
-    const index = Math.round(container.scrollLeft / step)
+    const cards = [...container.querySelectorAll('.service-card-item')]
+    const center = container.scrollLeft + container.clientWidth / 2
+    const index = cards.reduce((nearest, card, cardIndex) => {
+      const cardCenter = card.offsetLeft + card.clientWidth / 2
+      const nearestCard = cards[nearest]
+      const nearestCenter = nearestCard.offsetLeft + nearestCard.clientWidth / 2
+      return Math.abs(cardCenter - center) < Math.abs(nearestCenter - center) ? cardIndex : nearest
+    }, 0)
     const clamped = Math.max(0, Math.min(index, totalCards - 1))
     if (clamped !== currentIndex) {
+      currentIndexRef.current = clamped
       setCurrentIndex(clamped)
     }
   }
@@ -273,11 +292,11 @@ function Services() {
   }
 
   return (
-    <section id="services" className="flex min-h-screen w-full flex-col items-center justify-center bg-transparent py-16 md:py-24 overflow-hidden scroll-mt-16" >
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col text-center" style={{ marginBottom: '8rem' }}>
+    <section id="services" className="flex min-h-screen w-full scroll-mt-20 flex-col items-center justify-center overflow-hidden bg-transparent py-20 sm:py-24" >
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col text-center">
 
         {/* Header Section */}
-        <div className="flex flex-col items-center" style={{ marginBottom: '2rem' }}>
+        <div className="mb-8 flex flex-col items-center sm:mb-10">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -292,7 +311,7 @@ function Services() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false }}
             transition={{ delay: 0.1 }}
-            className="text-center text-5xl font-bold text-white md:text-6xl"
+            className="text-center text-4xl font-bold text-white sm:text-5xl md:text-6xl"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
             Our Services
@@ -304,10 +323,8 @@ function Services() {
           <div
             ref={carouselRef}
             onScroll={handleScroll}
-            className="flex w-full gap-8 overflow-x-auto scroll-smooth pt-4 pb-12 snap-x snap-mandatory"
+            className="flex w-full snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-8 pt-4 sm:gap-6 sm:pb-10 lg:gap-8"
             style={{
-              paddingLeft: scrollPadding,
-              paddingRight: scrollPadding,
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
               WebkitOverflowScrolling: 'touch'
@@ -332,7 +349,7 @@ function Services() {
         </div>
 
         {/* Navigation Arrows + Dot Indicators */}
-        <div className="flex flex-col items-center gap-4" style={{ marginTop: '1rem' }}>
+        <div className="mt-4 flex flex-col items-center gap-4">
           <div className="flex items-center gap-6">
             <button
               onClick={() => slide('left')}
@@ -374,4 +391,3 @@ function Services() {
 }
 
 export default Services
-

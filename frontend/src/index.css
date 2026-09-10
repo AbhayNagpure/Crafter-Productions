@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
@@ -43,4 +41,50 @@ body {
 /* Nav link hover underline */
 .nav-link:hover span {
   width: 100%;
+}
+
+.project-carousel {
+  grid-auto-columns: min(86vw, 340px);
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.project-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .project-carousel {
+    grid-auto-columns: calc((100% - 1.5rem) / 2);
+  }
+}
+
+@media (min-width: 1024px) {
+  .project-carousel {
+    grid-auto-columns: calc((100% - 4rem) / 3);
+  }
+}
+
+@media (min-width: 1280px) {
+  .project-carousel {
+    grid-auto-columns: calc((100% - 6rem) / 4);
+  }
+}
+
+/* Keep play controls visible on touch devices, including tablets. */
+.project-play-button {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  .project-play-button {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+
+  .group:hover .project-play-button {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

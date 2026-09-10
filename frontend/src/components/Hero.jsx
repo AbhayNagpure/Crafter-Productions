@@ -70,7 +70,7 @@ function Hero() {
   }, [])
 
   return (
-    <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-[#0a0a0a] px-6 text-center">
+    <section className="relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-[#0a0a0a] px-5 py-24 text-center sm:px-6">
       {/* ── Background layers ─────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 bg-[#111111]" aria-hidden="true" />
       <div
@@ -80,20 +80,20 @@ function Hero() {
       <NoiseOverlay />
 
       {/* ── Content ──────────────────────────────────────────── */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col items-center gap-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col items-center gap-6 sm:gap-8 lg:gap-10">
 
         {/* Gold label */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: easeOut }}
-          className="font-['Inter'] text-xs font-medium uppercase tracking-[0.42em] text-[#D4AF37] sm:text-sm"
+          className="font-['Inter'] text-[0.65rem] font-medium uppercase tracking-[0.28em] text-[#D4AF37] sm:text-sm sm:tracking-[0.42em]"
         >
           &mdash; Visual Storyteller &mdash;
         </motion.p>
 
         {/* Heading */}
-        <h1 className="text-[clamp(3rem,10vw,10rem)] font-black leading-[0.92] tracking-normal text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+        <h1 className="text-[clamp(2.5rem,12vw,10rem)] font-black leading-[0.92] tracking-normal text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
           <motion.span
             ref={line1Ref}
             initial={{ opacity: 0, x: -90 }}
@@ -119,7 +119,7 @@ function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.8, ease: easeOut }}
-          className="max-w-2xl font-['Inter'] text-lg font-light leading-8 text-white/60 sm:text-xl"
+          className="max-w-2xl font-['Inter'] text-base font-light leading-7 text-white/60 sm:text-lg sm:leading-8 lg:text-xl"
         >
           We don&apos;t just edit videos &mdash; we craft cinematic experiences.
         </motion.p>
@@ -129,7 +129,7 @@ function Hero() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.95, ease: easeOut }}
-          className="-mt-4 max-w-xl font-['Inter'] text-sm font-light leading-7 text-white/40"
+          className="max-w-xl font-['Inter'] text-xs font-light leading-6 text-white/40 sm:-mt-3 sm:text-sm sm:leading-7"
         >
           Wedding films that make you feel it all over again.
         </motion.p>

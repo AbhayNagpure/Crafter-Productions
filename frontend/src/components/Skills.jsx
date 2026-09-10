@@ -54,9 +54,9 @@ function Skills() {
       className="relative flex w-full flex-col items-center justify-start bg-transparent scroll-mt-0 border-t border-white/5"
       style={{ padding: 'clamp(4rem, 6vw, 7rem) clamp(1rem, 5vw, 5rem)' }}
     >
-      <div className="relative mx-auto max-w-[1440px] w-full px-4 md:px-10 lg:px-16">
+      <div className="relative mx-auto w-full max-w-[1440px] px-0 sm:px-4 md:px-10 lg:px-16">
         {/* Top Header */}
-        <div className="flex flex-col items-center text-center" style={{ marginBottom: '5rem' }}>
+        <div className="mb-12 flex flex-col items-center text-center sm:mb-16 lg:mb-20">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ function Skills() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, margin: '-50px' }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl font-bold text-white md:text-5xl"
+            className="text-3xl font-bold text-white sm:text-4xl md:text-5xl"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
             Built With Precision
@@ -129,7 +129,7 @@ function Skills() {
           </div>
 
           {/* Right Column: Tools of the Craft */}
-          <div className="lg:col-span-6 flex flex-col gap-6 bg-white/[0.02] border border-white/5 rounded-3xl p-6 md:p-8 w-full shadow-xl">
+          <div className="flex w-full flex-col gap-6 rounded-3xl border border-white/5 bg-white/[0.02] p-5 shadow-xl sm:p-6 md:p-8 lg:col-span-6">
             <div className="text-center mb-2">
               <h3 className="font-['Inter'] text-xl font-semibold text-white mb-2">
                 Tools of the Craft

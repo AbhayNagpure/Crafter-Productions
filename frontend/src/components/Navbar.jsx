@@ -16,19 +16,23 @@ function Navbar() {
 
   const handleNavClick = (e, link) => {
     e.preventDefault()
-    if (link === 'Home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    } else {
-      const element = document.getElementById(link.toLowerCase())
-      if (element) {
-        if (link.toLowerCase() === 'contact') {
-          element.scrollIntoView({ behavior: 'smooth', block: 'end' })
-        } else {
-          element.scrollIntoView({ behavior: 'smooth' })
+    setIsOpen(false)
+
+    // Let the mobile menu start closing before scrolling to its destination.
+    requestAnimationFrame(() => {
+      if (link === 'Home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        const element = document.getElementById(link.toLowerCase())
+        if (element) {
+          if (link.toLowerCase() === 'contact') {
+            element.scrollIntoView({ behavior: 'smooth', block: 'end' })
+          } else {
+            element.scrollIntoView({ behavior: 'smooth' })
+          }
         }
       }
-    }
-    setIsOpen(false)
+    })
   }
 
   return (
@@ -46,10 +50,10 @@ function Navbar() {
           : '1px solid transparent',
       }}
     >
-      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 py-5 md:px-20">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-4 py-4 sm:px-6 md:px-10 md:py-5 lg:px-12">
 
         {/* ── Logo ─────────────────────────────────────────────── */}
-        <a href="#" className="shrink-0 select-none ml-4 md:ml-6">
+        <a href="#" onClick={(e) => handleNavClick(e, 'Home')} className="shrink-0 select-none">
           <span
             className="font-['Bebas_Neue'] font-normal tracking-wider text-white"
             style={{ fontSize: '1.3rem' }}
@@ -65,7 +69,7 @@ function Navbar() {
         </a>
 
         {/* ── Nav links — desktop only ─────────────────────────── */}
-        <ul className="hidden items-center gap-10 md:flex">
+        <ul className="hidden items-center gap-8 lg:flex xl:gap-10">
           {NAV_LINKS.map((link) => (
             <li key={link}>
               <a
@@ -83,8 +87,9 @@ function Navbar() {
         {/* ── Hamburger — mobile only ────────────────────────── */}
         <button
           type="button"
-          className="text-[#D4AF37] md:hidden"
-          aria-label="Toggle menu"
+          className="flex h-11 w-11 items-center justify-center text-[#D4AF37] lg:hidden"
+          aria-label={isOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isOpen}
           onClick={() => setIsOpen(prev => !prev)}
         >
           {isOpen ? <X size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
@@ -99,7 +104,7 @@ function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden md:hidden w-full absolute top-full left-0"
+            className="absolute top-full left-0 w-full overflow-hidden lg:hidden"
             style={{
               backgroundColor: 'rgba(10,10,10,0.97)',
               backdropFilter: 'blur(16px)',
