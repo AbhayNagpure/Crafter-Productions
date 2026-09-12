@@ -12,7 +12,7 @@ const projectsData = [
   { id: 'PoQqR07nhyI', title: 'Vishal & Tina', category: 'pre-wedding teaser' },
 ]
 
-function VideoFrame({ project, isPlaying, onPlay, onClose, desktop = false }) {
+function VideoFrame({ project, isPlaying, onPlay, onClose }) {
   return (
     <div
       onClick={() => {
@@ -27,9 +27,7 @@ function VideoFrame({ project, isPlaying, onPlay, onClose, desktop = false }) {
       role={isPlaying ? undefined : 'button'}
       tabIndex={isPlaying ? undefined : 0}
       aria-label={isPlaying ? undefined : `Play ${project.title}`}
-      className={`group relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#111] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37] sm:rounded-2xl ${
-        desktop ? '' : 'shadow-2xl shadow-black/20'
-      }`}
+      className="group relative aspect-video w-full cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#111] shadow-2xl shadow-black/20 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#D4AF37] sm:rounded-2xl sm:shadow-none"
     >
       {!isPlaying ? (
         <>
@@ -44,27 +42,19 @@ function VideoFrame({ project, isPlaying, onPlay, onClose, desktop = false }) {
           />
           <div className="absolute inset-0 bg-black/35 transition-colors duration-500 group-hover:bg-black/10" />
           <div className="absolute inset-0 z-10 flex items-center justify-center">
-            <div className={`project-play-button flex items-center justify-center rounded-full bg-[#D4AF37]/95 text-black shadow-xl shadow-black/30 transition-all duration-300 ${
-              desktop ? 'h-12 w-12 md:h-14 md:w-14' : 'h-14 w-14'
-            }`}>
-              <Play fill="currentColor" size={desktop ? 22 : 24} className="ml-1" aria-hidden="true" />
+            <div className="project-play-button flex h-14 w-14 items-center justify-center rounded-full bg-[#D4AF37]/95 text-black shadow-xl shadow-black/30 transition-all duration-300 sm:h-12 sm:w-12 md:h-14 md:w-14">
+              <Play fill="currentColor" size={24} className="ml-1 sm:h-[22px] sm:w-[22px]" aria-hidden="true" />
             </div>
           </div>
 
-          {desktop ? (
-            <div className="pointer-events-none absolute bottom-0 left-0 z-10 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent px-4 pb-4 pt-16 sm:px-6 sm:pb-5 sm:pt-20">
-              <p className="mb-1 font-['Inter'] text-[0.58rem] font-medium uppercase tracking-[0.18em] text-[#D4AF37] sm:text-[0.65rem]">
-                {project.category}
-              </p>
-              <h3 className="font-['Playfair_Display'] text-base font-semibold leading-tight text-white sm:text-lg">
-                {project.title}
-              </h3>
-            </div>
-          ) : (
-            <span className="absolute bottom-4 right-4 z-10 font-['Inter'] text-[0.6rem] font-medium uppercase tracking-[0.2em] text-white/70">
-              Play film
-            </span>
-          )}
+          <div className="pointer-events-none absolute bottom-0 left-0 z-10 hidden w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent px-6 pb-5 pt-20 sm:block">
+            <h3 className="font-['Playfair_Display'] text-lg font-semibold leading-tight text-white">
+              {project.title}
+            </h3>
+          </div>
+          <span className="absolute bottom-4 right-4 z-10 font-['Inter'] text-[0.6rem] font-medium uppercase tracking-[0.2em] text-white/70 sm:hidden">
+            Play film
+          </span>
         </>
       ) : (
         <>
@@ -199,75 +189,46 @@ function Projects() {
           </p>
         </div>
 
-        {/* Phones: every project is shown vertically in the requested sequence. */}
-        <div className="flex w-full flex-col gap-7 sm:hidden">
-          {projectsData.map((project, index) => {
-            const isPlaying = playingVideoId === project.id
-            return (
-              <motion.article
-                key={project.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="mb-3 flex items-end justify-between gap-4 border-b border-white/10 pb-3">
-                  <div className="min-w-0">
-                    <p className="mb-1 font-['Inter'] text-[0.58rem] font-medium uppercase tracking-[0.2em] text-[#D4AF37]">
-                      {project.category}
-                    </p>
-                    <h3 className="truncate font-['Playfair_Display'] text-xl font-semibold leading-tight text-white">
-                      {project.title}
-                    </h3>
-                  </div>
-                  <span className="shrink-0 font-['Bebas_Neue'] text-3xl tracking-[0.08em] text-white/20">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                </div>
-                <VideoFrame
-                  project={project}
-                  isPlaying={isPlaying}
-                  onPlay={() => setPlayingVideoId(project.id)}
-                  onClose={() => setPlayingVideoId(null)}
-                />
-              </motion.article>
-            )
-          })}
-        </div>
-
-        {/* Tablet and laptop: retain the original compact carousel. */}
-        <div className="hidden sm:block">
+        {/* One shared gallery keeps a hidden layout from starting a second player. */}
+        <div>
           <div className="relative">
             <div
               ref={carouselRef}
               onScroll={handleScroll}
-              className="project-carousel grid grid-flow-col grid-rows-1 snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth pb-3 lg:grid-rows-2 lg:gap-8"
+              className="project-carousel flex flex-col gap-7 sm:grid sm:grid-flow-col sm:grid-rows-1 sm:snap-x sm:snap-mandatory sm:gap-6 sm:overflow-x-auto sm:scroll-smooth sm:pb-3 lg:grid-rows-2 lg:gap-8"
             >
               {projectsData.map((project, index) => (
-                <motion.div
+                <motion.article
                   key={project.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, margin: '-50px' }}
-                  transition={{ delay: index * 0.08, duration: 0.5 }}
-                  className="project-card snap-start"
+                  viewport={{ once: true, margin: '-50px' }}
+                  transition={{ duration: 0.5 }}
+                  className="project-card relative min-w-0 sm:snap-start"
                 >
+                  <div className="mb-3 flex items-end justify-between gap-4 border-b border-white/10 pb-3 sm:hidden">
+                    <h3 className="min-w-0 truncate font-['Playfair_Display'] text-xl font-semibold leading-tight text-white">
+                      {project.title}
+                    </h3>
+                    <span className="shrink-0 font-['Bebas_Neue'] text-3xl tracking-[0.08em] text-white/20">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  </div>
                   <VideoFrame
                     project={project}
                     isPlaying={playingVideoId === project.id}
                     onPlay={() => setPlayingVideoId(project.id)}
                     onClose={() => setPlayingVideoId(null)}
-                    desktop
                   />
-                </motion.div>
+                </motion.article>
               ))}
             </div>
 
-            <div className={`pointer-events-none absolute inset-y-0 left-0 z-20 w-8 bg-gradient-to-r from-[#080808] to-transparent transition-opacity duration-300 ${currentIndex > 0 ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
-            <div className={`pointer-events-none absolute inset-y-0 right-0 z-20 w-8 bg-gradient-to-l from-[#080808] to-transparent transition-opacity duration-300 ${currentIndex < maxIndex ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
+            <div className={`pointer-events-none absolute inset-y-0 left-0 z-20 hidden w-8 bg-gradient-to-r from-[#080808] to-transparent transition-opacity duration-300 sm:block ${currentIndex > 0 ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
+            <div className={`pointer-events-none absolute inset-y-0 right-0 z-20 hidden w-8 bg-gradient-to-l from-[#080808] to-transparent transition-opacity duration-300 sm:block ${currentIndex < maxIndex ? 'opacity-100' : 'opacity-0'}`} aria-hidden="true" />
           </div>
 
-          <div className="mt-9 flex items-center justify-between gap-5 border-t border-white/5 pt-5">
+          <div className="mt-9 hidden items-center justify-between gap-5 border-t border-white/5 pt-5 sm:flex">
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex items-center justify-between gap-4 font-['Inter'] text-[0.65rem] font-medium uppercase tracking-[0.18em] text-white/45">
                 <span>Browse projects</span>
